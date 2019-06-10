@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(事务管理)"></head>
+<body>
+<link rel="stylesheet" type="text/css" href="/css/dataTables.min.css">
+<style>
+    td {
+        text-align: center;
+    }
+</style>
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- 自定义内容区 -->
+            <div id="page-content" style="padding-bottom: 2%">
+                <!-- page header -->
+                <h1 id="page-header" th:text="事务列表"></h1>
+                <!--学年：-->
+                <!--<select id="yearSelect" name="yearCode">-->
+                    <!--<option value="所有学年" selected="selected">&#45;&#45;请选择学年&#45;&#45;</option>-->
+                    <!--&lt;!&ndash;<option th:each="year : ${years}" th:value="${year}" th:text="${year}"></option>&ndash;&gt;-->
+                <!--</select>-->
+                <!--专业：-->
+                <!--<select id="majorSelect" name="majorCode">-->
+                    <!--<option value="所有专业" selected="selected">&#45;&#45;请选择专业&#45;&#45;</option>-->
+                    <!--&lt;!&ndash;<option th:each="major : ${majors}" th:value="${major}" th:text="${major}"></option>&ndash;&gt;-->
+                <!--</select>-->
+                <!-- wrap div -->
+                <div class="row-fluid">
+                    <a class="btn btn-info" href="/publish">发布事务</a>
+                    <p></p>
+                </div>
+                <div>
+                    <table id="table_id_affairs" class="display">
+                        <thead>
+                        <tr>
+                            <th>标题</th>
+                            <th>事务所属</th>
+                            <th>发布时间</th>
+                            <th>发布人</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="affair:${affairList}">
+                            <td><a style="color: #0e90d2" th:text="${affair.title}" th:href="|/showAffair/${affair.affId}|" target="_Blank"></a></td>
+                            <td th:text="${affair.levelName}"></td>
+                            <td th:text="${#dates.format(affair.releaseTime,'yyyy-MM-dd')}"></td>
+                            <td th:text="${affair.name}"></td>
+                            <td><a class="btn btn-small btn-danger" th:href="|/manage/affair/delete/${affair.affId}|">删除</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+</div>
+<div th:include="/common/onload-js :: commonJS"></div>
+<script type="text/javascript" charset="utf8" src="/js/dataTables.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var table = $('#table_id_affairs').DataTable({
+            // serverSide: true,
+            // // searching: true,
+            // // searchable: true,
+            // paging: true,
+            // pagingType: "full_numbers",
+            // ordering: false,
+            aoColumnDefs: [{"bSortable": false, "aTargets": [4]}],
+            lengthMenu: [10, 20],
+            language: {
+                "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+                "infoEmpty": "无记录",//当没有数据时，左下角的信息
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+                "infoPostFix": "",//在摘要信息后继续追加的字符串
+                "thousands": ",",//千分位分隔符
+                "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                "processing": "处理中...",//用来描述加载进度的字符串
+                "search": "搜索",//用来描述搜索输入框的字符串
+                "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上一页",
+                    "next": "下一页",
+                    "last": "尾页"
+                }
+            },
+        });
+    })
+</script>
+</body>
+</html>

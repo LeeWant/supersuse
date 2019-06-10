@@ -1,0 +1,217 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.AdminInstitutionMapper">
+
+    <select id="selectAllInsts" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT * FROM t_institute
+        WHERE 1 = 1
+        <if test="instCode != null and instCode != ''">
+            and instCode like "%"#{instCode}"%"
+        </if>
+        <if test="name != null and name != ''">
+            and name like "%"#{name}"%"
+        </if>
+    </select>
+
+    <select id="selectClazzYears" resultType="java.lang.String">
+        -- 获取学年信息
+        SELECT DISTINCT c.year
+        FROM t_clazz c
+        order by c.year
+    </select>
+    <select id="selectClazzById" parameterType="int" resultType="Clazz">
+        select * from t_clazz where clazzId = #{clazzId}
+    </select>
+    <update id="updateInstInfo" parameterType="Institute">
+        UPDATE t_institute SET
+        name = #{name}
+        <if test="instCode != null and instCodeOld != instCode">
+            ,instCode = #{instCode}
+        </if>
+        where instCode = #{instCodeOld}
+    </update>
+
+    <insert id="insertInst" parameterType="Institute">
+        insert into t_institute(instCode,name) values (#{instCode},#{name})
+    </insert>
+
+    <select id="selectInstCodeInfo" resultType="Institute" parameterType="java.lang.String">
+        select * from t_institute
+        where instCode = #{instCode}
+    </select>
+
+    <select id="selectAllDepts" parameterType="java.util.Map" resultType="java.util.Map">
+        select i.instCode,d.deptCode,i.name iName,d.name dName
+        from t_department d
+        left join t_institute i on i.instCode = d.instCode
+        where 1 = 1
+        <if test="instCode != null and instCode != '' and instCode != 'ALLINS'">
+            and d.instCode = #{instCode}
+        </if>
+        <if test="deptCode != null and deptCode != '' and deptCode != 'ALLDEP'">
+            and d.deptCode like  "%"#{deptCode}"%"
+        </if>
+        <if test="name != null and name != ''">
+            and d.name like "%"#{name}"%"
+        </if>
+    </select>
+    <select id="selectMajorByDeptCode" parameterType="java.lang.String" resultType="java.util.Map">
+        select * from t_major
+        where deptCode = #{deptCode}
+    </select>
+    <update id="updateClazzInfo" parameterType="Clazz">
+        update t_clazz set majoCode = #{majoCode},
+                           teacherId = #{teacherId},
+                           clazzNumber = #{clazzNumber},
+                           year = #{year}
+        where clazzId = #{clazzId}
+    </update>
+    <select id="selectCodesByClazzId" parameterType="int" resultType="java.util.Map">
+        SELECT c.teacherId,m.majoCode,m.name mName,d.deptCode,d.name dName,i.instCode,i.name iName,u.name uName,u.userId,c.clazzId,c.year,SUBSTRING(c.clazzNumber,5) clazzNumber
+        FROM t_clazz c
+        LEFT JOIN t_major m ON c.majoCode = m.majoCode
+        LEFT JOIN t_department d ON d.deptCode = m.deptCode
+        LEFT JOIN t_institute i ON d.instCode = i.instCode
+        LEFT JOIN t_user u ON c.teacherId = u.userId
+        WHERE c.clazzId = #{clazzId}
+    </select>
+
+    <select id="selectAllMajors" parameterType="java.util.Map" resultType="java.util.Map">
+        select i.instCode,d.deptCode,i.name iName,d.name dName,m.name mName,m.majoCode
+        from t_major m
+        left join t_department d on d.deptCode = m.deptCode
+        left join t_institute i on i.instCode = d.instCode
+        where 1 = 1
+        <if test="instCode != null and instCode != '' and instCode != 'ALLINS'">
+            and i.instCode = #{instCode}
+        </if>
+        <if test="deptCode != null and deptCode != '' and deptCode != 'ALLDEP'">
+            and d.deptCode  = #{deptCode}
+        </if>
+        <if test="majoCode != null and majoCode != '' and majoCode != 'ALLMAJ'">
+            and m.majoCode like "%"#{majoCode}"%"
+        </if>
+        <if test="name != null and name != ''">
+            and d.name like "%"#{name}"%"
+        </if>
+    </select>
+
+    <select id="selectAllClazz" parameterType="java.util.Map" resultType="java.util.Map">
+        -- 查询所有的班级信息
+        SELECT COUNT(u2.userId) studentNum,c.clazzId,c.clazzNumber,c.year,c.isActivity,c.loginTime,m.name mName,i.name iName,d.name dName,u.name uName,u.phone,u.number
+        FROM t_clazz c
+        LEFT JOIN t_major m ON c.majoCode = m.majoCode
+        LEFT JOIN t_department d ON m.deptCode = d.deptCode
+        LEFT JOIN t_institute i ON i.instCode = d.instCode
+        LEFT JOIN t_user u ON u.userId = c.teacherId
+        LEFT JOIN t_user u2 ON c.clazzId = u2.clazzId
+        WHERE 1 = 1
+        <if test="instCode != null and instCode != '' and instCode != 'ALLINS'">
+            and i.instCode = #{instCode}
+        </if>
+        <if test="deptCode != null and deptCode != '' and deptCode != 'ALLDEP'">
+            and d.deptCode  = #{deptCode}
+        </if>
+        <if test="majoCode != null and majoCode != '' and majoCode != 'ALLMAJ'">
+            and m.majoCode = #{majoCode}
+        </if>
+        <if test="year != null and year != ''">
+            and c.year = #{year}
+        </if>
+        <if test="uName != null and uName != ''">
+            and u.name like "%"#{uName}"%"
+        </if>
+        GROUP BY c.clazzId
+    </select>
+
+    <delete id="deleteClazzById" parameterType="int">
+        delete from t_clazz where clazzId = #{clazzId}
+    </delete>
+
+    <select id="selectClazzByMajorAndClazzNumber" parameterType="java.lang.String" resultType="Clazz">
+        -- 根据班级专业代码和班级号查询班级
+        select * from t_clazz
+        where majoCode = #{majoCode} and clazzNumber = #{clazzNumber}
+    </select>
+
+    <insert id="insertClazz" parameterType="Clazz">
+        -- 插入一个新的班级
+        INSERT
+        INTO t_clazz(majoCode,clazzNumber,`year`,teacherId)
+        VALUES(#{majoCode},#{clazzNumber},#{year},#{teacherId})
+    </insert>
+
+    <insert id="insertMajor" parameterType="Major">
+        -- 插入一个新的专业
+        INSERT
+        INTO t_major(majoCode,deptCode,name)
+        VALUES(#{majoCode},#{deptCode},#{name})
+    </insert>
+    <select id="selectMajorByMajorCode" parameterType="java.lang.String" resultType="Major">
+        SELECT * FROM t_major
+        where majoCode = #{majoCode}
+    </select>
+
+    <select id="selectCodesByMajorCode" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT m.majoCode,d.deptCode,i.instCode,m.name mName,d.name dName,i.name iName FROM t_major m
+        LEFT JOIN t_department d ON m.deptCode = d.deptCode
+        LEFT JOIN t_institute i ON d.instCode = i.instCode
+        WHERE m.majoCode = #{majoCode}
+    </select>
+    <select id="selectDeptsByInstCode" resultType="java.util.Map" parameterType="java.lang.String">
+        SELECT * FROM t_department
+        where instCode = #{instCode}
+    </select>
+    <update id="updateMajorInfo" parameterType="Major">
+        UPDATE t_major SET
+        name = #{name},
+        deptCode = #{deptCode}
+        <if test="majoCode != null and majoCodeOld != majoCode">
+          ,majoCode = #{majoCode}
+        </if>
+        where majoCode = #{majoCodeOld}
+    </update>
+
+    <delete id="deleteMajorByCode" parameterType="java.lang.String">
+        DELETE FROM t_major
+        where majoCode = #{majoCode}
+    </delete>
+    <select id="selectDeptsByDeptCode" parameterType="java.lang.String" resultType="Department">
+        select * from t_department where deptCode = #{deptCode}
+    </select>
+    <insert id="insertDept" parameterType="Department">
+        insert into t_department(deptCode,instCode,name) values(#{deptCode},#{instCode},#{name})
+    </insert>
+    <select id="selectCodesByDeptCode" parameterType="java.lang.String" resultType="java.util.Map">
+        SELECT d.deptCode,i.instCode,d.name dName,i.name iName FROM t_department d
+        LEFT JOIN t_institute i ON d.instCode = i.instCode
+        WHERE d.deptCode = #{deptCode}
+    </select>
+    <update id="updateDeptInfo" parameterType="Department">
+        UPDATE t_department SET
+        name = #{name},
+        instCode = #{instCode}
+        <if test="deptCode != null and deptCodeOld != deptCode">
+            ,deptCode = #{deptCode}
+        </if>
+        where deptCode = #{deptCodeOld}
+    </update>
+    <delete id="deleteDeptByCode" parameterType="java.lang.String">
+        DELETE from t_department where deptCode = #{deptCode}
+    </delete>
+
+    <delete id="deleteInstByCode" parameterType="java.lang.String">
+        DELETE from t_institute where instCode = #{instCode}
+    </delete>
+
+    <select id="selectInstCodeByName" resultType="java.util.Map" parameterType="java.lang.String">
+        SELECT i.instCode,d.deptCode,m.majoCode,i.name iName,d.name dName,m.name mName
+        FROM t_institute i
+        LEFT JOIN t_department d ON i.instCode = d.instCode
+        LEFT JOIN t_major m ON d.deptCode = m.deptCode
+        WHERE i.name = #{name}
+        OR d.name = #{name}
+        OR m.name = #{name}
+    </select>
+
+</mapper>

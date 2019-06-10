@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:include="/common/onload-css :: commonHead(发布事宜)"></head>
+
+  <body>
+  	<!-- .height-wrapper -->
+	<div class="height-wrapper">
+		
+		<!-- header -->
+		<header th:include="/common/header :: commonHeader"></header>
+		<!-- end header -->
+		
+	    <div id="main" role="main"  class="container-fluid">
+			<div class="contained">
+				<!-- 左侧边栏 -->
+				<aside th:include="/common/aside-left :: commonLeft"></aside>
+				<!-- aside end -->
+				<div id="page-content">
+					<h1 id="page-header">发布新事宜</h1>
+					<form id="htmlForm" action="/affair" method="post" enctype="multipart/form-data">
+						<div>
+						学院：
+						<select id="instSelect" name="instCode">
+							<option value="ALLINS" selected="selected">--请选择学院--</option>
+							<option th:each="institute : ${instituteList}" th:value="${institute.instCode}" th:text="${institute.name}"></option>
+						</select>
+						系：
+						<select id="deptSelect" name="deptCode">
+							<option value="ALLDEP" selected="selected">--请选择系--</option>
+							<!--<option th:each="dept : ${deptList}" th:value="${dept.deptCode}" th:text="${dept.name}"></option>-->
+						</select>
+						专业：
+						<select id="majorSelect" name="majoCode">
+							<option value="ALLMAJ" selected="selected">--请选择专业--</option>
+							<!--<option th:each="major : ${majorList}" th:value="${major.majoCode}" th:text="${major.name}">Audi</option>-->
+						</select>
+						</div>
+						<div>
+							标题：
+							<input autocomplete="off" type="text" id="title" name="title" placeholder="主题..." maxlength="40">
+						</div>
+						<div id="editor" style="padding-bottom:1%;padding-top:1%">
+							<p><b>请在这里输入文本内容...</b></p>
+						</div>
+						<div  id="originFile">
+						</div>
+						<div class="" style="padding-bottom: 2%;padding-top: 1%">
+							<input type="button" class="btn btn-default" value="添加附件" id="addFile">
+							<input type="button" class="btn btn-info" value="提交" id="uploadBtn">
+						</div>
+					</form>
+				</div>
+				<!-- 右侧边栏 -->
+				<aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+				<!-- end aside right -->
+			</div>
+				
+	    </div><!--end fluid-container-->
+		<div class="push"></div>
+	</div>
+
+	<div th:include="/common/onload-js :: commonJS"></div>
+	<script type="text/javascript" src="js/wangEditor.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+        	//级联查询的方法
+            $("#instSelect").change(function () {
+				var majorSelect = $("#majorSelect").empty();
+                var instCode = $("#instSelect").val();
+                // alert(instCode)
+                if (instCode == "") {
+                    return;
+                }
+                $.ajax({
+                    cache: false,
+                    type: "post",
+                    url: "/getDept",
+                    data: {"instCode": instCode},
+                    success: function (data) {
+                        console.log(data);
+                        var deptCode = $("#deptSelect").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            deptCode.append("<option value='" + data[i].deptCode + "'>" + data[i].name + "</option>");
+                        }
+						majorSelect.append("<option value=\"ALLMAJ\">不限专业</option>");
+					}
+                })
+            })
+			$("#deptSelect").change(function (){
+				var deptCode = $("#deptSelect").val();
+				// alert(deptCode)
+				if(deptCode == ""){
+					return;
+				}
+				$.ajax({
+					cache: false,
+					type: "post",
+					url: "/getMajor",
+					data: {"deptCode": deptCode},
+					success: function (data) {
+						console.log(data);
+						var majoCode = $("#majorSelect").empty();
+						for(var i = 0; i < data.length;i++){
+							majoCode.append("<option value='" + data[i].majoCode + "'>" + data[i].name + "</option>")
+						}
+					}
+				})
+			})
+			$("#uploadBtn").click(function () {
+				//判断title是否为空
+				if($("#title").val()==null || $("#title").val() == ""){
+					alert("标题不能为空");
+				}else{
+					console.log(editor.txt.html());
+					var htmlForm=$('#htmlForm'); //得到form对象
+					// var formDate = new FormData(htmlForm);
+					// formDate.append("comment",editor.txt.html());
+					var tmpInput=$("<input type='text' style='display: none' name='comment'/>");
+					tmpInput.attr("value", editor.txt.html());
+					htmlForm.append(tmpInput);
+					htmlForm.submit();
+					// var request = new XMLHttpRequest();
+					// request.open("POST","/affair");
+					// request.send(formDate);
+				}
+			})
+			//添加附件的方法
+			$("#addFile").click(function () {
+				console.log($("#originFile").children().size());
+				if($("#originFile").children().size() < 5){
+					$("#originFile").append("<div><input multiple='multiple' type='file' name='files' onchange='checkFile(this)' value='请选择文件'><input class=\"btn btn-small btn-danger\" type='button' value='删除' onclick='doDelete(this)'></div>");
+				}else {
+					alert("最多添加五个附件");
+				}
+			});
+        });
+    </script>
+	<script type="text/javascript">
+
+		var E = window.wangEditor;
+		var editor = new E('#editor');
+		// 或者 var editor = new E( document.getElementById('editor') )
+		// 下面两个配置，使用其中一个即可显示“上传图片”的tab。但是两者不要同时使用！！！
+		editor.customConfig.uploadImgShowBase64 = true;  // 使用 base64 保存图片
+		// editor.customConfig.uploadImgServer = '/upload'  // 上传图片到服务器
+		editor.create();
+
+		//删除方法
+		function doDelete(obj) {
+			obj.parentNode.remove();
+		}
+		//检查文件属性
+		function checkFile(el){
+			var files = el.files;  //获取选择的文件对象
+			//获取文件后缀名
+			var index1=el.value.lastIndexOf(".");
+			var index2=el.value.length;
+			var suffix=el.value.substring(index1,index2);//后缀名
+			console.log(suffix);
+			// var allowTypes = ["image/jpeg","image/png","image/x-png","image/bmp","image/gif"]; //允许上传的文件类型
+			var allowTypes = [".pdf",".ppt",".docx",".xlsx",".dotm",".xlsm",".pptx",".doc",".pps",".ppt",".pot",".wps",".xls",".zip"];
+
+			var maxFileSize = 50 * 1024 * 1024;  //允许上传的单个文件的大小限制，最大能上传50M
+			var allowUpload = true; //经过校验之后是否允许上传
+			var errorMessage = "";  //校验文件之后，文件不符合要求的提示信息
+
+			for(var i=0; i< files.length; i++){
+				var fileName = files[i].name;    //文件名
+				console.log(fileName)
+				var fileSize = files[i].size;    //文件大小，单位为byte（字节）
+				console.log(fileSize)
+
+				var typeAccepted = false;
+				for(var j = 0; j < allowTypes.length; j++){
+					if(allowTypes[j] == suffix){
+						typeAccepted = true;
+						break;
+					}
+				}
+				if(typeAccepted != true){
+					errorMessage += fileName + "不符合上传文件格式！";
+					allowUpload = false;
+				}
+
+				if(typeAccepted && fileSize > maxFileSize){
+					errorMessage += fileName+"的文件大小超出了50M限制！";
+					allowUpload = false;
+				}
+			}
+
+			if(allowUpload != true){
+				el.outerHTML = el.outerHTML; //清空选择的文件
+				alert(errorMessage);
+			}
+		}
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(${affair.title})">
+    <style>
+        .download_a:hover {
+            text-decoration: #0e90d2;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- 自定义内容区 -->
+            <div id="page-content">
+                <h1 id="page-header" th:text="${affair.title}"></h1>
+                <div class="row-fluid">
+                    <div class="span12">
+                        <div class="span4">
+                            <span th:text="${affair.instPath}"></span>
+                        </div>
+                        <div class="span4">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发布时间:<span th:text="${#dates.format(affair.releaseTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                        </div>
+                        <div class="span4">
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;发布人:<span th:text="${affair.name}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="well light span12">
+                        <div th:name="${affair.affId}" th:utext="${affair.comment}" id="commentDiv"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+</div>
+
+<div th:include="/common/onload-js :: commonJS"></div>
+
+</body>
+<script type="text/javascript">
+</script>
+
+</html>

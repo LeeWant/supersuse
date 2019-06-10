@@ -1,0 +1,80 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.UserMapper">
+    <resultMap id="editView" type="UserEditView">
+        <id property="userId" column="userId"/>
+        <result property="name" column="name"/>
+        <result property="userCode" column="number"/>
+        <result property="clazz" column="clazz"/>
+        <result property="birth" column="birth"/>
+        <result property="sex" column="sex"/>
+        <result property="type" column="type"/>
+        <collection property="userRole" select="selectUserRole" column="userId"></collection>
+        <collection property="clazzList" select="selectClazzList" column="userId"></collection>
+    </resultMap>
+
+    <insert id="insertUser" parameterType="User">
+        insert IGNORE into t_user(clazzId,name,password,number,sex,birth,phone,type,loginTime,lastLogin)
+        values (#{clazzId},
+                #{name},
+                #{password},
+                #{number},
+                #{sex},
+                #{birth},
+                #{phone},
+                #{type},
+                #{loginTime},
+                #{lastLogin})
+    </insert>
+    <select id="selectUserByName" parameterType="java.lang.String" resultType="User">
+        select name,number,sex from t_user where name = #{username}
+    </select>
+    <select id="selectEditViewByUserId" parameterType="int" resultMap="editView">
+      -- 说明属于学生
+        SELECT u.userId,u.`name`,u.`number`,CONCAT(m.`name`,c.`clazzNumber`) clazz,u.`birth`,u.`sex`,u.`phone`,u.type
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.`clazzId` = c.`clazzId`
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        WHERE u.`userId` = #{userId}
+    </select>
+    <select id="selectUserRole" parameterType="int" resultType="java.lang.String">
+        -- 查询用户所属的角色
+        SELECT DISTINCT r.roleName
+        FROM t_user u
+        LEFT JOIN t_user_role ur ON u.userId = ur.userId
+        LEFT JOIN t_role r ON ur.roleId = r.roleId OR u.`type` = r.roleId
+        WHERE u.userId = #{userId}
+    </select>
+    <select id="selectClazzList" parameterType="int" resultType="java.lang.String">
+      -- 查询教师用户所管理的班级
+        SELECT CONCAT(m.`name`,c.`clazzNumber`)
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.`userId` = c.`teacherId`
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        WHERE u.`userId` = #{userId} AND c.`isActivity` = 1
+        ORDER BY c.`clazzNumber` ASC
+    </select>
+
+    <update id="updatePassword">
+        -- 更新用户密码
+        UPDATE t_user u SET u.`password`=#{newPassword}
+        WHERE u.`userId` = #{userId} AND u.`password` = #{oldPassword}
+    </update>
+
+    <update id="updateUserInfo" parameterType="User">
+        -- 更新用户信息
+        UPDATE t_user u SET u.`name` = #{name},
+                            u.`birth` = #{birth},
+                            u.`number` = #{number},
+                            u.`phone` = #{phone},
+                            u.`sex` = #{sex}
+        WHERE u.`userId` = #{userId}
+    </update>
+
+    <delete id="deleteUserById" parameterType="int">
+        -- 删除用户
+        DELETE FROM t_user
+        WHERE `userId` = #{userId}
+
+    </delete>
+</mapper>

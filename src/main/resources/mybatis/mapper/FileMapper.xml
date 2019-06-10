@@ -1,0 +1,44 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.FileMapper">
+    
+    <select id="selectAllFiles" resultType="java.util.Map">
+        SELECT f.affId,f.fileId,f.fileName,a.title,u.name,a.releaseTime,f.isDelete FROM t_file f
+        LEFT JOIN t_affair a ON f.affId = a.affId
+        LEFT JOIN t_user u ON a.userId = u.userId
+        where 1 = 1
+        <if test="title != null and title != ''">
+            and a.title like "%"#{title}"%"
+        </if>
+        <if test="fileName != null and fileName != ''">
+            and f.fileName like "%"#{fileName}"%"
+        </if>
+    </select>
+    <select id="selectFilesByAffId" resultType="java.util.Map">
+        select *
+        from t_file f
+        left join t_affair a on a.affId = f.affId
+    </select>
+    <delete id="deleteFileById">
+        DELETE from t_file where fileId = #{fileId}
+    </delete>
+
+    <delete id="deleteFilesByAffId" parameterType="java.lang.String">
+        DELETE from t_file where affId = #{affId}
+    </delete>
+
+    <select id="selectFileByFileId" parameterType="java.lang.String" resultType="MyFile">
+        SELECT * from t_file where fileId = #{fileId}
+    </select>
+
+    <update id="updateFileStatus">
+        UPDATE t_file SET isDelete = #{isDelete}
+        WHERE fileId = #{fileId}
+    </update>
+
+    <insert id="insertFile" parameterType="MyFile">
+        -- 插入附件
+        INSERT INTO t_file(fileID,affId,fileName,filePath)
+        VALUES (#{fileId},#{affId},#{fileName},#{filePath})
+    </insert>
+</mapper>

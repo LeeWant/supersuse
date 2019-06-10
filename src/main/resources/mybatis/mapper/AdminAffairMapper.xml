@@ -1,0 +1,57 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.AdminAffairMapper">
+
+    <select id="selectAllAffairs" resultType="java.util.Map">
+        SELECT a.affId,a.title,a.releaseTime,u.`name` uName,i.name iName,d.name dName,m.`name` mName,c.`clazzNumber`,a.isDelete,COUNT(*) - ISNULL(f.affId) fileNum
+        FROM t_affair a
+        LEFT JOIN t_user u ON a.userId = u.`userId`
+        LEFT JOIN t_institute i ON   a.instCode = i.instCode
+        LEFT JOIN t_department d ON a.deptCode = d.deptCode
+        LEFT JOIN t_major m ON a.majoCode = m.`majoCode`
+        LEFT JOIN t_clazz c ON a.clazzId = c.`clazzId`
+        LEFT JOIN t_file f ON a.affId = f.affId
+        GROUP BY a.affId
+    </select>
+
+    <update id="updateAffairStatus">
+        UPDATE t_affair SET isDelete = #{isDelete}
+        WHERE affId = #{affId}
+    </update>
+
+    <select id="selectAllAffairsBySearch" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT a.affId,a.title,a.releaseTime,u.`name` uName,i.name iName,d.name dName,m.`name`
+        mName,a.isDelete,COUNT(*) - ISNULL(f.affId) fileNum
+        FROM t_affair a
+        LEFT JOIN t_user u ON a.userId = u.`userId`
+        LEFT JOIN t_institute i ON a.instCode = i.instCode
+        LEFT JOIN t_department d ON a.deptCode = d.deptCode
+        LEFT JOIN t_major m ON a.majoCode = m.`majoCode`
+        LEFT JOIN t_file f ON a.affId = f.affId
+        where 1 = 1
+        <if test="start != null and start != '' or end != null and end != ''">
+            and a.releaseTime between #{start} and #{end}
+        </if>
+        <if test="instCode != null and instCode != '' and instCode != 'ALLINS'">
+            and a.instCode = #{instCode}
+        </if>
+        <if test="deptCode != null and deptCode != '' and deptCode != 'ALLDEP'">
+            and a.deptCode = #{deptCode}
+        </if>
+        <if test="majoCode != null and majoCode != '' and majoCode != 'ALLMAJ'">
+            and a.majoCode = #{majoCode}
+        </if>
+        <if test="title != null and title != ''">
+            and a.title like "%"#{title}"%"
+        </if>
+        GROUP BY a.affId
+    </select>
+
+    <delete id="deleteAffairById" parameterType="java.lang.String">
+        DELETE FROM t_affair
+        WHERE affId = #{affId}
+    </delete>
+
+
+
+</mapper>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>添加班级</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="stylesheet" href="../css/font.css">
+    <link rel="stylesheet" href="../css/xadmin.css">
+    <script type="text/javascript" src="../lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="../js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="layui-fluid">
+    <div class="layui-row">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label for="instSelect" class="layui-form-label">学院</label>
+                <div class="layui-input-inline">
+                    <select id="instSelect" lay-verify="required" lay-filter="instSelect" name="instCode">
+                        <option th:value="${codes.instCode}" th:text="${codes.iName}">--请选择学院--</option>
+                        <option th:each="institute : ${instituteList}"
+                                th:if="${institute.instCode != 'ALLINS' and institute.instCode != codes.instCode}"
+                                th:value="${institute.instCode}"
+                                th:text="${institute.name}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="deptSelect" class="layui-form-label">系</label>
+                <div class="layui-input-inline">
+                    <select id="deptSelect" lay-verify="required" lay-filter="deptSelect" name="deptCode">
+                        <option th:value="${codes.deptCode}" th:text="${codes.dName}">--请选择系--</option>
+                        <option th:each="dept:${deptList}" th:if="${dept.deptCode != codes.deptCode}"
+                                th:value="${dept.deptCode}" th:text="${dept.name}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="majoSelect" class="layui-form-label">专业</label>
+                <div class="layui-input-inline">
+                    <select id="majoSelect" lay-verify="required" lay-filter="majoSelect" name="majoCode">
+                        <option th:value="${codes.majoCode}" th:text="${codes.mName}">--请选择专业--</option>
+                        <option th:each="majo:${majoList}" th:if="${majo.majoCode != codes.majoCode}"
+                                th:value="${majo.majoCode}" th:text="${majo.name}"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_teacher" class="layui-form-label">辅导员</label>
+                <div class="layui-input-inline">
+                    <select id="L_teacher" name="teacherId" lay-verify="required">
+                        <option th:if="${codes.teacherId == null}" value="">--请选择辅导员--</option>
+                        <option th:if="${codes.teacherId != null}" th:value="${codes.teacherId}"
+                                th:text="${codes.uName}"></option>
+                        <option th:each="tea:${teachers}" th:if="${tea.userId != codes.teacherId}"
+                                th:value="${tea.userId}"
+                                th:text="|${tea.userName}(${tea.number})|"></option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="year" class="layui-form-label">学年</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" th:value="${codes.year}" lay-verify="required"
+                           placeholder="学年" name="year" id="year" autocomplete="off">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_num" class="layui-form-label">班号</label>
+                <div class="layui-input-inline">
+                    <!--隐藏的属性-->
+                    <input class="layui-input" th:value="${codes.clazzId}" style="display: none" readonly="readonly"
+                           autocomplete="off" name="clazzId">
+                    <input type="text" id="L_num" th:value="${codes.clazzNumber}" name="clazzNumber"
+                           placeholder="只能为两位数"
+                           lay-verify="number|required|clazzNum"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                </label>
+                <button class="layui-btn" lay-filter="add" lay-submit="">修改</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>layui.use(['laydate', 'form', 'layer', 'jquery'],
+    function () {
+        $ = layui.jquery;
+        var form = layui.form;
+        var layer = layui.layer;
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        var year = laydate.render({
+            elem: '#year', //指定元素
+            type: 'year'
+        });
+
+        //自定义验证规则
+        form.verify({
+            clazzNum: function (value) {
+                if (value.length != 2) {
+                    return '班号只能为两位数';
+                } else if (value == 0) {
+                    return '班号不能小于0';
+                }
+            }
+        });
+        //下拉列表框刷新
+        form.on('select(instSelect)', function (data) {
+            var majorSelect = $("#majoSelect").empty();
+            var instCode = $("#instSelect").val();
+            // alert(instCode)
+            // if (instCode == "") {
+            //     return;
+            // }
+            $.ajax({
+                cache: false,
+                type: "post",
+                url: "/getDept",
+                data: {"instCode": instCode},
+                success: function (data) {
+                    console.log(data);
+                    var deptCode = $("#deptSelect").empty();
+                    deptCode.append("<option value=\"\">--请选择系--</option>")
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].deptCode != 'ALLDEP') {
+                            deptCode.append("<option value='" + data[i].deptCode + "'>" + data[i].name + "</option>");
+                        }
+                    }
+                    majorSelect.append("<option value=\"\">--请选择专业--</option>");
+                    form.render('select');
+                }
+            });
+        });
+        form.on('select(deptSelect)', function (data) {
+            var deptCode = $("#deptSelect").val();
+            // alert(deptCode)
+            // if (deptCode == "") {
+            //     return;
+            // }
+            $.ajax({
+                cache: false,
+                type: "post",
+                url: "/getMajor",
+                data: {"deptCode": deptCode},
+                success: function (data) {
+                    console.log(data);
+                    var majoCode = $("#majoSelect").empty();
+                    majoCode.append("<option value=\"\">--请选择专业--</option>")
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].majoCode != 'ALLMAJ') {
+                            majoCode.append("<option value='" + data[i].majoCode + "'>" + data[i].name + "</option>")
+                        }
+                    }
+                    form.render('select');
+                }
+            });
+        });
+
+        //监听提交
+        form.on('submit(add)',
+            function (data) {
+                console.log(data);
+                //发异步，把数据提交给php
+                $.ajax({
+                    url: "/admin/clazz/edit",
+                    method: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(data.field),
+                    success: function (data) {
+                        console.log(data);
+                        if (data.code == 0) {
+                            layer.alert("修改成功", {
+                                    icon: 6
+                                },
+                                function () {
+                                    //关闭当前frame
+                                    xadmin.close();
+                                    // 可以对父窗口进行刷新
+                                    xadmin.father_reload();
+                                });
+                        } else {
+                            layer.alert(data.msg, {
+                                    icon: 5
+                                },
+                                function () {
+                                    //关闭当前frame
+                                    xadmin.close();
+                                    // 可以对父窗口进行刷新
+                                    xadmin.father_reload();
+                                });
+                        }
+                    }
+                });
+                return false;
+            });
+
+    });</script>
+</body>
+
+</html>

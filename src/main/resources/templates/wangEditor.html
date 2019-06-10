@@ -1,0 +1,34 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<link rel="stylesheet" href="zyupload/skins/zyupload-1.0.0.css " type="text/css">
+	<script type="text/javascript" src="zyupload/jquery-1.7.2.js"></script>
+	<script type="text/javascript" src="zyupload/zyupload-1.0.0.js"></script>
+	<script type="text/javascript" src="zyupload/zyupload-config.js"></script>
+</head>
+
+<body>
+<div th:fragment="wangEditor">
+	<div id="editor" style="padding-bottom:1%">
+		<p><b>请在这里输入文本内容...</b></p>
+	</div>
+	<!--<form action="/upload" method="post">-->
+		<!---->
+		<!--<input type="file" name="file" value="请选择附件">-->
+	<!--</form>-->
+	<div id="zyupload" class="zyupload"></div>
+</div>
+
+</body>
+<!-- 注意， 只需要引用 JS，无需引用任何 CSS ！！！-->
+<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+    <script type="text/javascript" src="js/wangEditor.min.js"></script>
+    <script type="text/javascript">
+        var E = window.wangEditor
+        var editor = new E('#editor')
+        // 或者 var editor = new E( document.getElementById('editor') )
+		// 下面两个配置，使用其中一个即可显示“上传图片”的tab。但是两者不要同时使用！！！
+		editor.customConfig.uploadImgShowBase64 = true   // 使用 base64 保存图片
+		// editor.customConfig.uploadImgServer = '/upload'  // 上传图片到服务器
+        editor.create()
+    </script>
+</html>

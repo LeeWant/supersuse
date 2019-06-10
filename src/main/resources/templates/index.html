@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(智能事务管理系统)">
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="/css/dataTables.min.css">
+<style>
+    td{
+        text-align:center;
+    }
+</style>
+
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- aside end -->
+            <div id="page-content" style="padding-bottom: 2%">
+                <h1 id="page-header">近期事宜</h1>
+                <table id="table_id_affairs" class="display">
+                    <thead>
+                    <tr>
+                        <th>标题</th>
+                        <th>事务所属</th>
+                        <th>发布时间</th>
+                        <th>发布人</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+</div>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<div th:include="/common/onload-js :: commonJS"></div>
+<script type="text/javascript" charset="utf8" src="/js/dataTables.min.js"></script>
+<script type="text/javascript" charset="utf8" src="http://momentjs.cn/downloads/moment.js"></script>
+<script type="text/javascript">
+    $(document).ready( function () {
+        $('#table_id_affairs').DataTable({
+            serverSide: true,
+            // searching: true,
+            // searchable: true,
+            paging: true,
+            pagingType: "full_numbers",
+            ordering: false,
+            lengthMenu: [ 15, 30],
+            language: {
+                "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+                "infoEmpty": "无记录",//当没有数据时，左下角的信息
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+                "infoPostFix": "",//在摘要信息后继续追加的字符串
+                "thousands": ",",//千分位分隔符
+                "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                "processing": "处理中...",//用来描述加载进度的字符串
+                "search": "搜索",//用来描述搜索输入框的字符串
+                "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上一页",
+                    "next": "下一页",
+                    "last": "尾页"
+                }
+            },
+            //获取数据
+            ajax: {
+                "url": "/showAffairs",
+                "type": 'POST',
+            },
+            //设置数据
+            columns: [
+                {data: "title", defaultContent:"空",render: function (data, type, row, meta) {
+                        var now = new Date().getTime();
+                        var date = moment(row.releaseTime).format("YYYY-MM-DD HH:mm:ss");
+                        var oldTime = (new Date(Date.parse(date.replace(/-/g,"/")))).getTime();
+                        // console.log(data+"发布于:"+oldTime);
+                        // console.log(data+"当前时间:"+now);
+                        // console.log("相差"+dayNum+"天");
+                        var dayNum = (now - oldTime)/(1000*60*60*24);
+                        var head = "<a href='/showAffair/"+row.affId+"' target='_blank' style='color: #0e90d2'>"
+                        var foot = data+"</a>";
+                        if(dayNum < 7){
+                            //最新七天发布的事务有new图标
+                            head = head+"<span style='color: red'>【最新】</span>";
+                        }
+                        return head+foot;
+                    }
+                },
+                {data: "levelName",defaultContent: "--"},
+                {data: "releaseTime", defaultContent:"空",render:function (data) { return moment(data).format("YYYY-MM-DD HH:mm:ss") }},
+                {data: "name", defaultContent: "未知"}
+            ]
+        })
+    } );
+</script>
+</body>
+</html>

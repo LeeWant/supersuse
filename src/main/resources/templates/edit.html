@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(个人主页)">
+</head>
+
+<body>
+
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- 自定义内容区 -->
+            <div id="page-content">
+                <!-- page header -->
+                <h1 id="page-header" th:text="${userInfo.name}"></h1>
+                <div class="fluid-container">
+                    <!-- widget grid -->
+                    <section id="widget-grid" class="">
+                        <!-- row-fluid -->
+                        <div class="row-fluid">
+                            <article class="span12 sortable-grid ui-sortable">
+                                <!-- new widget -->
+                                <div class="jarviswidget jarviswidget-sortable" id="widget-id-0" role="widget">
+                                    <header role="heading">
+                                        <h2>个人信息</h2>
+                                    </header>
+                                    <!-- wrap div -->
+                                    <div role="content">
+                                        <div class="inner-spacer">
+                                            <!-- content goes here -->
+                                            <form class="form-horizontal themed">
+                                                <fieldset>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i class="icon-user"></i>姓名</label>
+                                                        <div class="controls">
+                                                            <p th:text="${userInfo.name}"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div th:if="${userInfo.clazz != null}" class="control-group">
+                                                        <label class="control-label"><i
+                                                                class="icon-tag"></i>专业班级</label>
+                                                        <div class="controls">
+                                                            <p th:text="${userInfo.clazz}"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div th:if="${userInfo.type != 2}" class="control-group">
+                                                        <label class="control-label"><i
+                                                                class="icon-tag"></i>管理班级</label>
+                                                        <div th:each="clazz:${userInfo.clazzList}" class="controls">
+                                                            <p th:text="${clazz}"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label th:if="${userInfo.type == 2}" class="control-label">
+                                                            <i class="icon-credit-card"></i>学号</label>
+                                                        <label th:if="${userInfo.type != 2}" class="control-label">
+                                                            <i class="icon-credit-card"></i>工号</label>
+                                                        <div class="controls">
+                                                            <p th:text="${userInfo.userCode}"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i class="icon-key"></i>密码</label>
+                                                        <div class="controls">
+                                                            <input class="btn btn-small" data-toggle="modal"
+                                                                   data-target="#myModal" type="button" value="修改密码">
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i
+                                                                class="icon-calendar"></i>出生日期</label>
+                                                        <div class="controls">
+                                                            <p th:text="${userInfo.birth == null}?'暂无':${#dates.format(userInfo.birth,'yyyy-MM-dd')}"></p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i class="icon-circle-blank"></i>性别</label>
+                                                        <div class="controls">
+                                                            <p th:if="${userInfo.sex != null}" th:text="${userInfo.sex == 1}? '男':'女'"></p>
+                                                            <p th:if="${userInfo.sex == null}">暂无</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i class="icon-mobile-phone"></i>联系方式</label>
+                                                        <div class="controls">
+                                                            <div class="row-fluid">
+                                                                <span id="textPhone" th:text="${userInfo.phone != null}?${userInfo.phone}:'暂无'"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="control-group">
+                                                        <label class="control-label"><i
+                                                                class="icon-lock"></i>系统身份</label>
+                                                        <div th:each="role:${userInfo.userRole}" class="controls">
+                                                            <p th:text="${role}"></p>
+                                                        </div>
+                                                    </div>
+                                                </fieldset>
+                                            </form>
+                                        </div>
+                                        <!-- end content-->
+                                    </div>
+                                    <!-- end wrap div -->
+                                </div>
+                                <!-- end widget -->
+                            </article>
+                        </div>
+
+                        <!-- end row-fluid -->
+                    </section>
+                    <!-- end widget grid -->
+                </div>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+</div>
+<!--模态框-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 style="color:#FFFFFF" class="modal-title" id="myModalLabel">修改密码</h4>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm" class="form-horizontal themed">
+                    <fieldset>
+                        <div class="control-group">
+                            <label class="control-label" for="oldPassword"><i class="icon-lock"></i>原始密码</label>
+                            <div class="controls">
+                                <input maxlength="15" type="password" id="oldPassword">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="newPassword"><i class="icon-lock"></i>新密码</label>
+                            <div class="controls">
+                                <input maxlength="15" type="password" id="newPassword">
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="renewPassword"><i class="icon-lock"></i>确认密码</label>
+                            <div class="controls">
+                                <input maxlength="15" type="password" id="renewPassword">
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="checkPassword()" class="btn btn-primary">提交更改</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<div th:include="/common/onload-js :: commonJS"></div>
+</body>
+<script type="text/javascript">
+    function checkPassword() {
+        var oldPassword = $("#oldPassword").val();
+        var newPassword = $("#newPassword").val();
+        var renewPassword = $("#renewPassword").val();
+        if (/^[0-9a-zA-Z_]{6,15}$/.test(newPassword)) {
+            if (newPassword != renewPassword) {
+                alert("两次输入的密码不一致");
+            } else {
+                if (newPassword == oldPassword) {
+                    alert("新旧密码不能一样");
+                } else {
+                    // 检查完成传送数据到后台
+                    $.ajax({
+                        url: "/checkPassword",
+                        type: "post",
+                        data: {
+                            oldPassword:oldPassword,
+                            newPassword:newPassword
+                        },
+                        cache: false,
+                        success:function (data) {
+                            console.log(data);
+                            if(data == true){
+                                alert("修改密码成功");
+                                location.reload();
+                            }else {
+                                alert("原始密码错误，如果忘记请联系管理员");
+                            }
+                        },
+                        error:function () {
+                            alert("网络连接失败，请检查网络");
+                        }
+                    })
+                }
+            }
+        } else {
+            alert("密码为6-15位的数字大小写字母组合");
+        }
+    }
+</script>
+
+</html>

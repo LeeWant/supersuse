@@ -1,0 +1,71 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.ClazzMapper">
+
+    <select id="selectClazzById" parameterType="int" resultType="Clazz">
+      SELECT c.clazzId,
+            c.`clazzNumber`,
+            c.`isActivity`,
+            c.`loginTime`,
+            c.`majoCode`,
+            c.`monitorId`,
+            c.`remark`,
+            c.`teacherId`,
+            c.`year`,
+            u.name AS 'monitorName',
+            m.`name` AS 'majorName'
+        FROM t_clazz c
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        LEFT JOIN t_user u ON c.`monitorId` = u.`userId`
+        WHERE c.`clazzId` = #{clazzId}
+    </select>
+
+    <select id="selectClazzByTeacherId" parameterType="int" resultType="Clazz">
+        -- 查询对应教师id所管理的班级
+                SELECT c.clazzId,
+            c.`clazzNumber`,
+            c.`isActivity`,
+            c.`loginTime`,
+            c.`majoCode`,
+            c.`monitorId`,
+            c.`remark`,
+            c.`teacherId`,
+            c.`year`,
+            u.name AS 'monitorName',
+            m.`name` AS 'majorName',
+            COUNT(*) - ISNULL(u2.userId) AS studentNum
+        FROM t_clazz c
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        LEFT JOIN t_user u ON c.`monitorId` = u.`userId`
+        LEFT JOIN t_user u2 ON c.clazzId = u2.clazzId
+        WHERE c.`teacherId` = #{teacherId}
+        GROUP BY c.`clazzId`
+    </select>
+
+    <select id="getStudentByClazzId" parameterType="int" resultType="UserEditView">
+        SELECT u.`userId`,u.`name`,u.`birth`,u.`number`,u.`phone`,u.`sex`,u.`type` FROM t_clazz c
+        INNER JOIN t_user u ON u.`clazzId` = c.`clazzId`
+        WHERE c.`clazzId` = #{clazzId} and u.isDelete = 0
+        ORDER BY u.`number`
+    </select>
+
+    <update id="updateClazzInfo">
+        -- 更新班级信息
+        UPDATE t_clazz c SET
+        -- monitorId > 0时进行更新
+        <if test="monitorId > 0">
+            c.`monitorId` = #{monitorId} ,
+        </if>
+        -- monitorId == -1 时清空班级管理员
+        <if test="monitorId == -1">
+            c.monitorId = null,
+        </if>
+        c.`remark` = #{remark}
+        WHERE c.`clazzId` = #{clazzId}
+    </update>
+
+    <update id="updateMonitorId">
+        UPDATE t_clazz c SET  c.`monitorId` = #{monitorId} WHERE c.`clazzId` = #{clazzId}
+    </update>
+
+</mapper>

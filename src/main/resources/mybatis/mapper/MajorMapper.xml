@@ -1,0 +1,23 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.MajorMapper">
+
+
+    <select id="selectAllInstitute" resultType="Institute">
+        SELECT i.instCode,i.name FROM t_institute i
+    </select>
+    <select id="selectAllDepartment" resultType="Department">
+        SELECT d.deptCode,d.instCode,d.name FROM t_department d
+    </select>
+    <select id="selectDepartmentByInstCode" parameterType="java.lang.String" resultType="Department">
+        SELECT d.deptCode,d.instCode,d.name FROM t_department d where d.instCode = #{instCode}
+    </select>
+    <select id="selectAllMajor" resultType="Major">
+        SELECT m.majoCode,m.deptCode,m.name FROM t_major m
+    </select>
+    <select id="selectMajorByDeptCode" parameterType="java.lang.String" resultType="Major">
+        SELECT m.majoCode,m.deptCode,m.name FROM t_major m WHERE m.deptCode = #{deptCode}
+    </select>
+
+
+</mapper>

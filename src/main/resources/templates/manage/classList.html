@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(班级管理)"></head>
+<body>
+<link rel="stylesheet" type="text/css" href="/css/dataTables.min.css">
+<style>
+    td {
+        text-align: center;
+    }
+
+    .modal.fade.in {
+        top: 90px;
+    }
+</style>
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- 自定义内容区 -->
+            <div id="page-content" style="padding-bottom: 2%">
+                <!-- page header -->
+                <h1 id="page-header" th:text="班级列表"></h1>
+                学年：
+                <select id="yearSelect" name="yearCode">
+                    <option value="所有学年" selected="selected">--请选择学年--</option>
+                    <option th:each="year : ${years}" th:value="${year}" th:text="${year}"></option>
+                </select>
+                专业：
+                <select id="majorSelect" name="majorCode">
+                    <option value="所有专业" selected="selected">--请选择专业--</option>
+                    <option th:each="major : ${majors}" th:value="${major}" th:text="${major}"></option>
+                </select>
+                <!-- wrap div -->
+                <div>
+                    <table id="table_id_clazz" class="display">
+                        <thead>
+                        <tr>
+                            <th>专业</th>
+                            <th>班级</th>
+                            <th>管理员</th>
+                            <th>学生数量</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="clazz:${clazzList}">
+                            <td th:id="|clazzMajor${clazz.getClazzId()}|" th:text="${clazz.getMajorName()}"></td>
+                            <td th:id="|clazzNumber${clazz.getClazzId()}|" th:text="${clazz.getClazzNumber()}"></td>
+                            <td th:id="|clazzMonitor${clazz.getClazzId()}|"
+                                th:text="${clazz.getMonitorName() eq null?'暂无':clazz.getMonitorName() }"></td>
+                            <td th:id="|clazzAffairCount${clazz.getClazzId()}|"
+                                th:text="${clazz.getStudentNum()}"></td>
+                            <td th:id="|clazzRemark${clazz.getClazzId()}|"
+                                th:text="${clazz.getRemark() == null?'暂无':clazz.getRemark()}"></td>
+                            <td><a href="javascript:void(0)" th:onclick="|showModal(${clazz.getClazzId()})|"><i
+                                    class="icon-wrench"></i></a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+    <!--模态框-->
+    <div class="modal fade" id="clazzModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true" style="z-index: -1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 style="color:#FFFFFF" class="modal-title" id="myModalLabel">班级信息</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="editClazzForm" class="form-horizontal themed">
+                        <fieldset>
+                            <p id="clazzId" style="display: none"></p>
+                            <div class="control-group">
+                                <label class="control-label">专业：</label>
+                                <div class="controls">
+                                    <p id="clazzMajor"></p>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">班级：</label>
+                                <div class="controls">
+                                    <p id="clazzNumber"></p>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">班级管理员：</label>
+                                <div class="controls">
+                                    <select id="monitorSelect" name="monitorId">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">班级备注：</label>
+                                <div class="controls">
+                                    <input autocomplete="off" type="text" id="clazzRemark" name="remark">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <button type="button" class="btn btn-default" id="clazzManage"
+                                            onclick="enterClazz()">进入班级管理页
+                                    </button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" onclick="submitEdit()" class="btn btn-primary">提交更改</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+</div>
+
+<div th:include="/common/onload-js :: commonJS"></div>
+<script type="text/javascript" charset="utf8" src="/js/dataTables.min.js"></script>
+<script type="text/javascript">
+    function showModal(clazzId) {
+        $('#clazzId').text(clazzId);
+        $('#clazzMajor').text($('#clazzMajor' + clazzId).text());
+        $('#clazzNumber').text($('#clazzNumber' + clazzId).text());
+        // $('#clazzMonitor').text();
+        var monitorName = $('#clazzMonitor' + clazzId).text();
+        //每次打开模态框清空下拉列表
+        $('#monitorSelect').empty();
+        //第一个下拉列表默认为被选人
+        $('#monitorSelect').append("<option value='0' selected='selected'>" + monitorName + "</option>");
+        $('#clazzRemark').val($('#clazzRemark' + clazzId).text());
+        $.ajax({
+            url: "/manage/clazz/getStudents",
+            type: 'post',
+            data: {
+                clazzId: clazzId,
+            },
+            success: function (data) {
+                // console.log("返回数据：" + data);
+                var data = JSON.parse(data);
+                // console.log("解析数据：" + data);
+                for (var index in data) {
+                    if (data[index] != null && data[index].name != monitorName) {
+                        $('#monitorSelect').append("<option value='" + data[index].userId + "'>" + data[index].name + "</option>");
+                    }
+                }
+                if(index == 0){
+                    $('#monitorSelect').append("<option value='-1'>暂无候选人</option>");
+                }else {
+                    $('#monitorSelect').append("<option value='-1'>不设置候选人</option>");
+                }
+            }
+        })
+        $('#clazzModal').modal('show');
+        $('#clazzModal').css({
+            'z-index': 1050
+        })
+    }
+
+    function enterClazz() {
+        var clazzId = $('#clazzId').text();
+        console.log("进入班级管理页:" + clazzId);
+        window.location.href = "/manage/clazz/"+clazzId;
+    }
+
+    function submitEdit() {
+        var clazzId = $('#clazzId').text();
+        var remark = $('#clazzRemark').val();
+        var monitorId = $('#monitorSelect').val();
+        $.ajax({
+            url: '/manage/clazz/editInfo',
+            type: 'post',
+            data: {
+                clazzId: clazzId,
+                remark: remark,
+                monitorId: monitorId
+            },
+            success: function (data) {
+                console.log(data);
+                if (data == true) {
+                    location.reload();
+                } else {
+                    alert("服务器无响应，请联系管理员");
+                }
+            }
+        })
+
+
+    }
+
+    $.fn.dataTable.ext.search.push(
+        function (settings, data, dataIndex) {
+            // var yearSelect = parseInt($('#yearSelect').val(), 10);
+            var majorSelect = $('#majorSelect').val();
+            var yearSelect = $('#yearSelect').val();
+            var year = data[1];
+            var majorCode = data[0]; // use data for the age column
+
+            if (majorSelect == '所有专业') {
+                if (yearSelect == '所有学年') {
+                    return true;
+                } else if (year.indexOf(yearSelect) > -1) {
+                    return true;
+                }
+            } else if (majorSelect == majorCode) {
+                if (yearSelect == '所有学年') {
+                    return true;
+                } else if (year.indexOf(yearSelect) > -1) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    );
+
+    $(document).ready(function () {
+        var table = $('#table_id_clazz').DataTable({
+            // serverSide: true,
+            // // searching: true,
+            // // searchable: true,
+            // paging: true,
+            // pagingType: "full_numbers",
+            // ordering: false,
+            aoColumnDefs: [{"bSortable": false, "aTargets": [4, 5]}],
+            lengthMenu: [10, 20],
+            language: {
+                "decimal": "",//小数的小数位符号  比如“，”作为数字的小数位符号
+                "emptyTable": "没有数据哟~~",//没有数据时要显示的字符串
+                "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",//左下角的信息，变量可以自定义，到官网详细查看
+                "infoEmpty": "无记录",//当没有数据时，左下角的信息
+                "infoFiltered": "(从 _MAX_ 条记录过滤)",//当表格过滤的时候，将此字符串附加到主要信息
+                "infoPostFix": "",//在摘要信息后继续追加的字符串
+                "thousands": ",",//千分位分隔符
+                "lengthMenu": "每页 _MENU_ 条记录",//用来描述分页长度选项的字符串
+                "loadingRecords": "加载中...",//用来描述数据在加载中等待的提示字符串 - 当异步读取数据的时候显示
+                "processing": "处理中...",//用来描述加载进度的字符串
+                "search": "搜索",//用来描述搜索输入框的字符串
+                "zeroRecords": "没有找到",//当没有搜索到结果时，显示
+                "paginate": {
+                    "first": "首页",
+                    "previous": "上一页",
+                    "next": "下一页",
+                    "last": "尾页"
+                }
+            },
+        });
+
+        // Event listener to the two range filtering inputs to redraw on input
+        $('#yearSelect,#majorSelect').change(function () {
+            table.draw();
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: supersuse
+    password: Super123.com
+    url: jdbc:mysql://localhost:3306/super_suse?useSSL=false&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+    #配置连接池数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 200MB
+#类包别名
+mybatis:
+  type-aliases-package: com.lee.supersuse.pojo
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  configuration:
+    call-setters-on-nulls: true
+#日志打印SQL输出
+logging:
+  level:
+    com.lee.supersuse.mapper: debug
+
+# 自定义常量
+my:
+  path: /files/supersuse #文件储存路径

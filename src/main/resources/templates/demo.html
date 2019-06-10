@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:include="/common/onload-css :: commonHead(待定义标题)">
+<body>
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header th:include="/common/header :: commonHeader"></header>
+    <!-- end header -->
+
+    <div id="main" role="main" class="container-fluid">
+        <div class="contained">
+            <!-- 左侧边栏 -->
+            <aside th:include="/common/aside-left :: commonLeft"></aside>
+            <!-- 自定义内容区 -->
+            <div id="page-content">
+                <!-- page header -->
+                <h1 id="page-header" th:text="待定义内容"></h1>
+            </div>
+            <!-- 右侧边栏 -->
+            <aside class="right" th:include="/common/aside-right :: commonRight"></aside>
+            <!-- end aside right -->
+        </div>
+
+    </div><!--end fluid-container-->
+    <div class="push"></div>
+</div>
+<div th:include="/common/onload-js :: commonJS"></div>
+</body>
+</html>

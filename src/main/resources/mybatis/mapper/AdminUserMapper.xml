@@ -1,0 +1,107 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.AdminUserMapper">
+    <select id="selectAllUserByType" resultType="java.util.Map">
+        -- 查询selectAllUserByType
+        SELECT u.`number`,u.`userId`,u.`name` as userName,u.`phone`,u.`sex`,u.`isDelete`,m.`name` as majorName,CONCAT_WS('',m.`name`,c.`clazzNumber`) AS majorClazz
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.`clazzId` = c.`clazzId`
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        WHERE u.`type` = #{type}
+        <if test="search != null">
+            AND u.`name` LIKE "%"#{search}"%"
+        </if>
+    </select>
+
+    <select id="selectAllStudentByPage" resultType="java.util.Map" parameterType="java.util.Map">
+        -- 分页查询所有的学生
+        SELECT u.`number`,u.`userId`,u.`name` AS uName,u.`phone`,u.`sex`,u.`isDelete`,m.`name` AS nName,CONCAT_WS('',m.`name`,c.`clazzNumber`) AS majorClazz
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.`clazzId` = c.`clazzId`
+        LEFT JOIN t_major m ON c.`majoCode` = m.`majoCode`
+        LEFT JOIN t_department d ON m.deptCode = d.deptCode
+        LEFT JOIN t_institute i ON d.instCode = i.instCode
+        WHERE u.`type` = 2
+        <if test="instCode != null and instCode != '' and instCode != 'ALLINS'">
+            and i.instCode = #{instCode}
+        </if>
+        <if test="deptCode != null and deptCode != '' and deptCode != 'ALLDEP'">
+            and d.deptCode  = #{deptCode}
+        </if>
+        <if test="majoCode != null and majoCode != '' and majoCode != 'ALLMAJ'">
+            and m.majoCode = #{majoCode}
+        </if>
+        <if test="year != null and year != ''">
+            and c.year = #{year}
+        </if>
+        <if test="uName != null and uName != ''">
+            and u.name like "%"#{uName}"%"
+        </if>
+        <if test="number != null and number != ''">
+            and u.number like "%"#{number}"%"
+        </if>
+    </select>
+
+    <select id="selectAllTeacherByPage" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT u.userId,u.number,u.name uName,u.phone,u.isDelete,COUNT(*) - ISNULL(c.teacherId) clazzNum,u.sex
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.userId = c.teacherId
+        WHERE u.type = 4
+        <if test="number != null and number != ''">
+            and u.number like "%"#{number}"%"
+        </if>
+        <if test="uName != null and uName != ''">
+            and u.name like "%"#{name}"%"
+        </if>
+        GROUP BY u.userId
+    </select>
+    <select id="selectUserByNumber" parameterType="java.lang.String" resultType="User">
+        select * from t_user
+        where `number` = #{number}
+    </select>
+    <update id="updateUserInfo" parameterType="User">
+        UPDATE t_user
+        SET name = #{name},
+            sex = #{sex},
+            <if test="number != null and numberOld != null and number != numberOld">
+                number = #{number},
+            </if>
+            phone = #{phone}
+        WHERE `userId` = #{userId}
+    </update>
+    <update id="updateUserIsDelete" parameterType="int">
+        UPDATE t_user
+        SET isDelete = #{isDelete}
+        WHERE `userId` = #{userId}
+    </update>
+    <delete id="deleteUser">
+        delete from t_user
+        where userId = #{userId}
+    </delete>
+    <insert id="insertUser" parameterType="User">
+        insert IGNORE into t_user(clazzId,name,password,number,sex,birth,phone,type,loginTime,lastLogin)
+        values (#{clazzId},
+                #{name},
+                #{password},
+                #{number},
+                #{sex},
+                #{birth},
+                #{phone},
+                #{type},
+                #{loginTime},
+                #{lastLogin})
+    </insert>
+    <delete id="deleteStudentByClazzId" parameterType="int">
+        delete from t_user
+        where clazzId = #{clazzId} and type = 2
+    </delete>
+
+    <update id="updateUserPassword">
+        update t_user set password = #{password}
+        where userId = #{userId}
+    </update>
+    <select id="selectUserById" parameterType="int" resultType="User">
+        select * from t_user
+        where userId = #{userId}
+    </select>
+</mapper>

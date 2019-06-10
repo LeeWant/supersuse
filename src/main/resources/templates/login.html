@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+
+    <title>SuperSuse-校园事务管理系统</title>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+
+    <!-- http://davidbcalhoun.com/2010/viewport-metatag -->
+    <meta name="HandheldFriendly" content="True"/>
+    <meta name="MobileOptimized" content="320"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+    <!--// OPTIONAL & CONDITIONAL CSS FILES //-->
+    <!-- date picker css -->
+    <!--<link rel="stylesheet" href="css/datepicker.css?v=1"/>-->
+    <!-- full calander css -->
+    <!--<link rel="stylesheet" href="css/fullcalendar.css?v=1"/>-->
+    <!-- data tables extended CSS -->
+    <!--<link rel="stylesheet" href="css/TableTools.css?v=1"/>-->
+    <!-- bootstrap wysimhtml5 editor -->
+    <!--<link rel="stylesheet" href="css/bootstrap-wysihtml5.css?v=1"/>-->
+    <!--<link rel="stylesheet" href="css/wysiwyg-color.css"/>-->
+    <!-- custom/responsive growl messages -->
+    <!--<link rel="stylesheet" href="css/toastr.custom.css?v=1"/>-->
+    <!--<link rel="stylesheet" href="css/toastr-responsive.css?v=1"/>-->
+    <!--<link rel="stylesheet" href="css/jquery.jgrowl.css?v=1"/>-->
+
+    <!-- // DO NOT REMOVE OR CHANGE ORDER OF THE FOLLOWING // -->
+    <!-- bootstrap default css (DO NOT REMOVE) -->
+    <link rel="stylesheet" href="css/bootstrap.min.css?v=1"/>
+    <link rel="stylesheet" href="css/bootstrap-responsive.min.css?v=1"/>
+    <!-- font awsome and custom icons -->
+    <link rel="stylesheet" href="css/font-awesome.min.css?v=1"/>
+    <link rel="stylesheet" href="css/cus-icons.css?v=1"/>
+    <!-- jarvis widget css -->
+    <link rel="stylesheet" href="css/jarvis-widgets.css?v=1"/>
+    <!-- Data tables, normal tables and responsive tables css -->
+    <link rel="stylesheet" href="css/DT_bootstrap.css?v=1"/>
+    <link rel="stylesheet" href="css/responsive-tables.css?v=1"/>
+    <!-- used where radio, select and form elements are used -->
+    <link rel="stylesheet" href="css/uniform.default.css?v=1"/>
+    <link rel="stylesheet" href="css/select2.css?v=1"/>
+    <!-- main theme files -->
+    <link rel="stylesheet" href="css/theme.css?v=1"/>
+    <link rel="stylesheet" href="css/theme-responsive.css?v=1"/>
+
+    <!-- // THEME CSS changed by javascript: the CSS link below will override the rules above // -->
+    <!-- For more information, please see the documentation for "THEMES" -->
+    <link rel="stylesheet" id="switch-theme-js" href="css/themes/default.css?v=1"/>
+    <!-- To switch to full width -->
+    <link rel="stylesheet" id="switch-width" href="css/full-width.css?v=1"/>
+
+    <!-- Webfonts -->
+    <!--<link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Lato:300,400,700' type='text/css'/>-->
+
+    <!-- Print Invoice CSS -->
+    <link rel="stylesheet" href="css/print-invoice.css"/>
+
+    <!-- All javascripts are located at the bottom except for HTML5 Shim -->
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="js/include/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- For Modern Browsers -->
+    <link rel="shortcut icon" href="img/favicons/favicon.png"/>
+    <!-- For everything else -->
+    <link rel="shortcut icon" href="img/favicons/favicon.ico"/>
+    <!-- For retina screens -->
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="img/favicons/apple-touch-icon-retina.png"/>
+    <!-- For iPad 1-->
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="img/favicons/apple-touch-icon-ipad.png"/>
+    <!-- For iPhone 3G, iPod Touch and Android -->
+    <link rel="apple-touch-icon-precomposed" href="img/favicons/apple-touch-icon.png"/>
+
+    <!-- iOS web-app metas -->
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+
+    <!-- Startup image for web apps -->
+    <link rel="apple-touch-startup-image" href="img/splash/ipad-landscape.png"
+          media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:landscape)"/>
+    <link rel="apple-touch-startup-image" href="img/splash/ipad-portrait.png"
+          media="screen and (min-device-width: 481px) and (max-device-width: 1024px) and (orientation:portrait)"/>
+    <link rel="apple-touch-startup-image" href="img/splash/iphone.png" media="screen and (max-device-width: 320px)"/>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style>
+        #v_container {
+            width: 100px;
+            height: 40px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- .height-wrapper -->
+<div class="height-wrapper">
+
+    <!-- header -->
+    <header>
+        <!-- tool bar -->
+        <div id="header-toolbar" class="container-fluid">
+            <!-- .contained -->
+            <div class="contained">
+
+                <!-- theme name -->
+                <h1> SuperSuse <span class="hidden-phone">- 校园事务管理系统</span></h1>
+                <!-- end theme name -->
+
+                <!-- span4 -->
+
+                <!-- end span4 -->
+            </div>
+            <!-- end .contained -->
+        </div>
+        <!-- end tool bar -->
+
+    </header>
+    <!-- end header -->
+    <div id="login-logo">
+
+    </div>
+    <div class="jarviswidget login">
+        <header>
+            <h2>校园事务管理系统</h2>
+        </header>
+
+        <div class="widget alert alert-info adjusted">
+            <i class="cus-exclamation"></i>
+            <strong th:if="${errmsg eq null}">请输入学号和密码。</strong>
+            <strong th:if="${errmsg != null}" style="color: red" th:text="${errmsg}"></strong>
+        </div>
+        <!-- content goes here -->
+        <div id="main-content">
+            <form action="/loginCheck" method="post" class="form-signin" id="target">
+                <div class="control-group">
+                    <input type="text" name="logincode" class="input-block-level" autofocus="autofocus" placeholder="学号或工号"
+                           maxlength="20" autocomplete="off"/>
+                </div>
+                <div class="control-group">
+                    <input type="password" name="password" class="input-block-level" placeholder="密码" maxlength="15"/>
+                </div>
+                <div class="control-group">
+                    <input autocomplete="off" type="text" id="code_input" maxlength="4"
+                           placeholder="验证码"/>
+                    <div id="v_container"></div>
+                </div>
+                <div class="control-group no-border">
+                    <div style="text-align: right;">
+                        <input class="btn btn-primary" type="submit" value="登录" id="login-btn">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- end content goes here -->
+    </div>
+</div>
+<!-- end .height-wrapper -->
+
+<!-- footer -->
+
+<!-- if you like you can insert your footer here -->
+
+<!-- end footer -->
+
+<!--================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+
+<!-- Link to Google CDN's jQuery + jQueryUI; fall back to local -->
+<script src="js/jquery.min.js"></script>
+<script src="/js/gVerify.js" type="text/javascript"></script>
+<script>
+    var verifyCode = new GVerify("v_container");
+    // console.log(verifyCode)
+    $("#target").submit(function (e) {
+        var res = verifyCode.validate(document.getElementById("code_input").value);
+        if (res) {
+            // alert("验证正确");
+            return true;
+        } else {
+            alert("请输入正确的验证码");
+            this.reset();
+            return false;
+        }
+    });
+</script>
+<script>window.jQuery || document.write('<script src="js/libs/jquery.min.js"><\/script>')</script>
+<!--<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>-->
+<script>window.jQuery.ui || document.write('<script src="js/libs/jquery.ui.min.js"><\/script>')</script>
+<!-- IMPORTANT: Jquery Touch Punch is always placed under Jquery UI -->
+<script src="js/include/jquery.ui.touch-punch.min.js"></script>
+
+<!-- REQUIRED: Datatable components -->
+<!-- DISABLED <script src="js/include/jquery.accordion.min.js"></script> -->
+
+<!-- REQUIRED: Toastr & Jgrowl notifications  -->
+<script src="js/include/toastr.min.js"></script>
+<!--<script src="js/include/jquery.jgrowl.min.js"></script>-->
+
+<!-- REQUIRED: Sleek scroll UI  -->
+<!-- DISABLED <script src="js/include/slimScroll.min.js"></script> -->
+
+<!-- REQUIRED: Datatable components -->
+<!-- DISABLED <script src="js/include/jquery.dataTables.min.js"></script> -->
+<!-- DISABLED <script src="js/include/DT_bootstrap.min.js"></script> -->
+
+<!--<script type="text/javascript">-->
+<!--var ismobile = (/iphone|ipad|ipod|android|blackberry|mini|windows\sce|palm/i.test(navigator.userAgent.toLowerCase()));-->
+<!--if (!ismobile) {-->
+
+<!--/** ONLY EXECUTE THESE CODES IF MOBILE DETECTION IS FALSE **/-->
+
+<!--/* REQUIRED: Datatable PDF/Excel output componant */-->
+
+<!--/*&#45;&#45; document.write('<script src="js/include/ZeroClipboard.min.js"><\/script>'); &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/TableTools.min.js"><\/script>'); &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/jquery.uniform.min.js"><\/script>'); &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/select2.min.js"><\/script>'); &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/jquery.excanvas.min.js"><\/script>');  &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/jquery.placeholder.min.js"><\/script>');  &#45;&#45;*/-->
+
+<!--/** DEMO SCRIPTS **/-->
+<!--$(function () {-->
+<!--/* jarvis tooltips */-->
+<!--$.jGrowl("No authentication is needed <strong>press</strong> on <strong>Sign in</strong> to continue...", {-->
+<!--header: 'Hey there stranger!',-->
+<!--sticky: false,-->
+<!--life: 5000,-->
+<!--speed: 500,-->
+<!--theme: 'with-icon',-->
+<!--position: 'top-right', //this is default position-->
+<!--easing: 'easeOutBack',-->
+<!--animateOpen: {-->
+<!--height: "show"-->
+<!--},-->
+<!--animateClose: {-->
+<!--opacity: 'hide'-->
+<!--}-->
+<!--});-->
+<!--});-->
+
+<!--} else {-->
+
+<!--/** ONLY EXECUTE THESE CODES IF MOBILE DETECTION IS TRUE **/-->
+
+<!--/*&#45;&#45; document.write('<script src="js/include/selectnav.min.js"><\/script>'); &#45;&#45;*/-->
+<!--/*&#45;&#45; document.write('<script src="js/include/responsive-tables.min.js"><\/script>'); &#45;&#45;*/-->
+<!--}-->
+<!--</script>-->
+
+</body>
+</html>

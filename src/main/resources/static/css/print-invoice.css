@@ -1,0 +1,44 @@
+	/*         
+	     __                   .__        
+	    |__|____ __________  _|__| ______
+	    |  \__  \\_  __ \  \/ /  |/  ___/
+	    |  |/ __ \|  | \/\   /|  |\___ \ 
+	/\__|  (____  /__|    \_/ |__/____  >
+	\______|    \/                    \/ 
+	
+	Copyright 2013 - Jarvis : Smart Admin Template
+	
+	 * This is part of an item on wrapbootstrap.com
+	 * https://wrapbootstrap.com/user/myorange
+	 * ==================================
+	 * 
+      
+       Print Invoice CSS */
+
+@media print {
+	aside, header, .alert, .btn, #page-header{
+		display:none !important;
+	}
+	table {
+		border-bottom:1px dotted #333;
+		border-top:1px dotted #333;
+	}
+	.invoice {
+		border:none;
+		margin-top:-70px;
+	}
+	.invoice td a {
+		font-weight:normal;
+	}
+	.invoice-body table td, .invoice-body table th, .invoice-header, .invoice-client-info, .invoice-footer {
+		padding-left:16px;
+		padding-right:16px;
+		font-family: 'Segoe UI', Tahoma, sans-serif !important;
+	}
+	.footer, .push {
+		display:none;
+	}
+	
+}
+
+

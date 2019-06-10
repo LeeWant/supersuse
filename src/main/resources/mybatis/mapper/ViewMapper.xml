@@ -1,0 +1,120 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.ViewMapper">
+    <resultMap id="loginView" type="UserLoginView">
+        <id property="userId" column="userId"/>
+        <result property="name" column="name"/>
+        <result property="number" column="number"/>
+        <result property="sex" column="sex"/>
+        <result property="clazzNumber" column="clazzNumber"/>
+        <result property="type" column="type"/>
+        <result property="instCode" column="instCode"/>
+        <result property="deptCode" column="deptCode"/>
+        <result property="majoCode" column="majoCode"/>
+        <collection property="roleCodes" select="selectRoleCode" column="userId"></collection>
+        <collection property="menuCodes" select="selectMenuCode" column="userId"></collection>
+        <collection property="resCodes" select="selectResCode" column="userId"></collection>
+    </resultMap>
+
+    <select id="userLoginCheck" parameterType="java.lang.String" resultMap="loginView">
+        -- 用户登陆验证
+        SELECT u.userId,u.name,u.number,u.sex,u.type,c.clazzNumber,i.`instCode`,d.`deptCode`,m.`majoCode`
+        FROM t_user u
+        LEFT JOIN t_clazz c ON u.`clazzId` = c.clazzId
+        LEFT JOIN t_major m ON c.majoCode = m.majoCode
+        LEFT JOIN t_department d ON m.deptCode = d.deptCode
+        LEFT JOIN t_institute i ON d.instCode = i.instCode
+        WHERE BINARY u.number = #{number} and BINARY u.password = #{password} and u.isDelete = 0
+    </select>
+
+    <select id="selectRoleCode" parameterType="int" resultType="java.lang.String">
+        -- 查询用户id对应的角色代码
+        SELECT DISTINCT roleCode
+        FROM t_user u
+        LEFT JOIN t_user_role ur ON u.userId = ur.userId
+        LEFT JOIN t_role r ON ur.roleId = r.roleId OR u.`type` = r.roleId
+        WHERE u.userId = #{0}
+    </select>
+
+    <select id="selectMenuCode" parameterType="int" resultType="java.lang.String">
+        -- 查询用户id对应的菜单代码
+        SELECT DISTINCT menuCode
+        FROM t_user u
+        LEFT JOIN t_user_role ur ON u.userId = ur.userId
+	    LEFT JOIN t_role r ON ur.roleId = r.roleId  OR u.`type` = r.roleId
+        LEFT JOIN t_role_menu rm ON r.roleId = rm.roleId
+        LEFT JOIN t_menu m ON rm.menuId = m.menuId
+        WHERE u.userId = #{0}
+    </select>
+
+    <select id="selectResCode" resultType="java.lang.String">
+        -- 查询用户id对应的资源代码
+        SELECT DISTINCT resCode
+        FROM t_user u
+        LEFT JOIN t_user_role ur ON u.userId = ur.userId
+        LEFT JOIN t_role r ON ur.roleId = r.roleId  OR u.`type` = r.roleId
+        LEFT JOIN t_role_resource rr ON r.roleId = rr.roleId
+        LEFT JOIN t_resource res ON rr.resId = res.resId
+        WHERE u.userId = #{0}
+    </select>
+
+    <select id="selectAffairViewsByPage" parameterType="int" resultType="AffairView">
+        -- 查询出AffairView用于index页面展示数据
+        SELECT affId,title,releaseTime,`name`
+        FROM t_affair a LEFT JOIN t_user u ON a.userId = u.userId
+        WHERE a.isDelete = #{isDelete}
+        <if test="search != null">
+            AND title LIKE "%"#{search}"%"
+        </if>
+        ORDER BY releaseTime DESC
+    </select>
+
+    <select id="selectAffairViewsByUserId" parameterType="int" resultType="AffairView">
+        -- 查询教师自己创建的事务信息
+        SELECT t.affId,t.userId,title,releaseTime,`name`,levelName,levelCodes,levelCode FROM (
+        SELECT a.affId,a.title,a.releaseTime,u.`name`,
+        CONCAT_WS('>',i.name,d.name,m.name) levelName,
+        CONCAT_WS('>',a.`instCode`,d.`deptCode`,m.`majoCode`) levelCodes,
+        SUBSTRING_INDEX(CONCAT_WS('>',a.`instCode`,d.`deptCode`,m.`majoCode`),'>',-1) levelCode,a.`userId`
+        FROM t_affair a
+        LEFT JOIN t_user u ON a.userId = u.userId
+        LEFT JOIN t_institute i ON a.`instCode` = i.instCode
+        LEFT JOIN t_department d ON a.`deptCode` = d.deptCode AND d.deptCode != 'ALLDEP'
+        LEFT JOIN t_major m ON a.`majoCode` = m.majoCode AND m.majoCode != 'ALLMAJ'
+        WHERE a.isDelete = #{isDelete}
+        ) t
+        WHERE userId = #{userId}
+
+    </select>
+
+    <select id="selectAffairViewsByPageAndRole" resultType="AffairView">
+        -- 查询事务所属的学院
+        SELECT affId,title,releaseTime,`name`,levelName,levelCodes,levelCode FROM (
+        SELECT a.affId,a.title,a.releaseTime,u.`name`,CONCAT_WS('>',i.name,d.name,m.name) levelName,
+        CONCAT_WS('>',a.`instCode`,d.`deptCode`,m.`majoCode`) levelCodes,
+        SUBSTRING_INDEX(CONCAT_WS('>',a.`instCode`,d.`deptCode`,m.`majoCode`),'>',-1) levelCode,a.isDelete
+        FROM t_affair a
+        LEFT JOIN t_user u ON a.userId = u.userId
+        LEFT JOIN t_institute i ON a.`instCode` = i.instCode
+        LEFT JOIN t_department d ON a.`deptCode` = d.deptCode AND d.deptCode != 'ALLDEP'
+        LEFT JOIN t_major m ON a.`majoCode` = m.majoCode AND m.majoCode != 'ALLMAJ'
+        <if test="search != null">
+            WHERE a.title LIKE "%"#{search}"%"
+        </if>
+        ) t
+        WHERE t.isDelete = #{isDelete}
+        <foreach collection="user.roleCodes" item="roleCode">
+            <if test="roleCode == 'ADMIN' or user.type == 4">
+            -- 管理员可查看所有
+              OR 1 = 1
+            </if>
+        </foreach>
+        AND (t.levelCode = 'ALLINS' OR t.levelCode = #{user.instCode} OR t.levelCode = #{user.deptCode} OR t.levelCode = #{user.majoCode})
+        ORDER BY t.releaseTime DESC
+    </select>
+
+    <insert id="insertIpVisit" parameterType="Ip">
+        INSERT INTO t_ip VALUES(#{ipId},#{ipAddress},DEFAULT,#{userId},#{userName})
+    </insert>
+
+</mapper>

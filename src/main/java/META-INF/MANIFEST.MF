@@ -1,0 +1,33 @@
+Manifest-Version: 1.0
+Class-Path: thymeleaf-extras-java8time-3.0.3.RELEASE.jar spring-contex
+ t-5.1.5.RELEASE.jar hibernate-validator-6.0.14.Final.jar xmlbeans-3.1
+ .0.jar curvesapi-1.06.jar commons-collections4-4.3.jar unbescape-1.1.
+ 6.RELEASE.jar spring-webmvc-5.1.5.RELEASE.jar jboss-logging-3.3.2.Fin
+ al.jar jackson-annotations-2.9.0.jar pagehelper-spring-boot-autoconfi
+ gure-1.2.3.jar logback-core-1.2.3.jar classmate-1.4.0.jar spring-expr
+ ession-5.1.5.RELEASE.jar pagehelper-spring-boot-starter-1.2.3.jar jac
+ kson-core-2.9.8.jar spring-boot-starter-jdbc-2.1.3.RELEASE.jar tomcat
+ -embed-el-9.0.16.jar pagehelper-5.1.2.jar mybatis-spring-boot-autocon
+ figure-1.3.0.jar javax.annotation-api-1.3.2.jar spring-boot-starter-t
+ hymeleaf-2.1.3.RELEASE.jar poi-4.1.0.jar tomcat-embed-websocket-9.0.1
+ 6.jar mybatis-spring-1.3.1.jar logback-classic-1.2.3.jar commons-math
+ 3-3.6.1.jar spring-boot-starter-web-2.1.3.RELEASE.jar spring-boot-sta
+ rter-logging-2.1.3.RELEASE.jar poi-ooxml-schemas-4.1.0.jar lombok-1.1
+ 8.6.jar jackson-datatype-jsr310-2.9.8.jar commons-compress-1.18.jar v
+ alidation-api-2.0.1.Final.jar fastjson-1.2.39.jar log4j-to-slf4j-2.11
+ .2.jar spring-boot-starter-json-2.1.3.RELEASE.jar spring-jcl-5.1.5.RE
+ LEASE.jar spring-core-5.1.5.RELEASE.jar druid-1.1.12.jar spring-boot-
+ autoconfigure-2.1.3.RELEASE.jar spring-aop-5.1.5.RELEASE.jar spring-j
+ dbc-5.1.5.RELEASE.jar jul-to-slf4j-1.7.25.jar commons-codec-1.11.jar 
+ spring-beans-5.1.5.RELEASE.jar mybatis-spring-boot-starter-1.3.0.jar 
+ tomcat-embed-core-9.0.16.jar spring-boot-starter-tomcat-2.1.3.RELEASE
+ .jar spring-boot-starter-2.1.3.RELEASE.jar jsqlparser-1.0.jar spring-
+ tx-5.1.5.RELEASE.jar mysql-connector-java-5.1.45.jar jackson-module-p
+ arameter-names-2.9.8.jar poi-ooxml-4.1.0.jar attoparser-2.0.5.RELEASE
+ .jar jackson-databind-2.9.8.jar slf4j-api-1.7.25.jar log4j-api-2.11.2
+ .jar HikariCP-3.2.0.jar spring-boot-2.1.3.RELEASE.jar snakeyaml-1.23.
+ jar spring-web-5.1.5.RELEASE.jar jackson-datatype-jdk8-2.9.8.jar myba
+ tis-3.4.4.jar thymeleaf-spring5-3.0.11.RELEASE.jar thymeleaf-3.0.11.R
+ ELEASE.jar
+Main-Class: com.lee.supersuse.SupersuseApplication
+

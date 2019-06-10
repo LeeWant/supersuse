@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<aside class="right" th:fragment="commonRight">
+
+    <!-- sparkline stats -->
+    <ul class="mystats indented">
+        <li class="first">
+            <h1><span>事务总数:</span><p th:text="${session.count.allConut}"></p></h1>
+            <div class="mychart"></div>
+        </li>
+        <li>
+            <h1><span>本月发布:</span><p th:text="${session.count.monthCont}"></p></h1>
+            <div class="mychart"></div>
+        </li>
+        <li>
+            <h1><span>本周发布:</span><p th:text="${session.count.weekConut}"></p></h1>
+            <div class="mychart"></div>
+        </li>
+        <li class="last">
+            <h1><span>访问量:</span><p th:text="${session.count.peopleConut}"></p></h1>
+            <div class="mychart"></div>
+        </li>
+    </ul>
+
+    <!-- date picker -->
+    <div id="datepicker"></div>
+    <div class="divider"></div>
+    <!-- end date picker -->
+
+</aside>
+</body>
+</html>

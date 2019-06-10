@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+</head>
+
+<body>
+<div class="x-nav">
+            <span class="layui-breadcrumb">
+                <a href="">首页</a>
+                <a href="">事务管理</a>
+                <a>
+                    <cite>文件列表</cite></a>
+            </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       onclick="location.reload()" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i>
+    </a>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-body ">
+                    <form class="layui-form layui-col-space5">
+
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input type="text" id="fileName" name="fileName" placeholder="请输入文件名" autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <input type="text" id="title" name="title" placeholder="请输入事务标题" autocomplete="off"
+                                   class="layui-input">
+                        </div>
+                        <div class="layui-input-inline layui-show-xs-block">
+                            <a class="layui-btn" id="search" lay-filter="search">
+                                <i class="layui-icon">&#xe615;</i></a>
+                        </div>
+                    </form>
+                </div>
+                <div class="layui-card-header">
+                    <button class="layui-btn layui-btn-danger" id="deleteAllBtn">
+                        <i class="layui-icon"></i>批量删除
+                    </button>
+                    <!--<a class="layui-btn" onclick="xadmin.open('添加文件','/admin/file-add',600,450)" target="_blank">-->
+                    <!--<i class="layui-icon"></i>添加-->
+                    <!--</a>-->
+                </div>
+                <div class="layui-card-body ">
+                    <table id="file-table" lay-filter="file-table" class="layui-table layui-form"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="download">下载</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+
+    <!--&lt;!&ndash; 这里同样支持 laytpl 语法，如： &ndash;&gt;-->
+    <!--{{#  if(d.auth > 2){ }}-->
+    <!--<a class="layui-btn layui-btn-xs" lay-event="check">审核</a>-->
+    <!--{{#  } }}-->
+</script>
+<script type="text/html" id="barStatus">
+    {{#  if(d.isDelete == 0){ }}
+    <a lay-event="status"><input type="checkbox" name="switch" lay-text="启用|停用" checked="true" lay-skin="switch"></a>
+    {{#  } }}
+    {{#  if(d.isDelete == 1){ }}
+    <a lay-event="status"><input type="checkbox" name="switch" lay-text="启用|停用" lay-event="status"
+                                 lay-skin="switch"></a>
+    {{#  } }}
+</script>
+<script>
+    layui.use(['table', 'util'],
+        function () {
+            var table = layui.table;
+            var util = layui.util;
+
+            var tableIns = table.render({
+                elem: '#file-table'
+                , url: '/admin/file-list/json'
+                , cellMinWidth: 80 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , page: true //开启分页
+                , limit: 10
+                , id: 'file-reload'
+                , cols: [
+
+                    [
+                        {type: 'checkbox', width: 80}
+                        , {field: 'fileId', width: 260, title: 'ID', sort: false}
+                        , {
+                        title: '事务标题', sort: true, templet: function (d) {
+                            return "<a style='color: #0e90d2;text-decoration:underline' href='/showAffair/" + d.affId + "' target='_blank'>" + d.title + "</a>"
+                        }
+                    }
+                        , {field: 'fileName', minWidth: 100, title: '文件名', sort: true}
+                        , {
+                        field: 'releaseTime', width: 160, sort: true, title: '上传时间', templet: function (d) {
+                            return util.toDateString(d.releaseTime, "yyyy-MM-dd HH:mm:ss");
+                        }
+                    }
+                        , {field: 'name', width: 80, title: '发布人', sort: true}
+                        , {title: '状态', width: 100, toolbar: '#barStatus'}
+                        , {fixed: 'right', title: '操作', width: 150, align: 'center', toolbar: '#barDemo'}
+                    ]
+
+                ]
+            });
+
+            function reloadTable(){
+                var title = $('#title').val();
+                var fileName = $('#fileName').val();
+                tableIns.reload({
+                    where: { //设定异步数据接口的额外参数，任意设
+                        fileName: fileName,
+                        title: title
+                    }
+                    , page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                });
+            }
+
+            //重载方法
+            $('#search').on('click', function () {
+                reloadTable();
+            });
+
+            table.on('tool(file-table)', function (obj) { //注：tool是工具条事件名，test是table原始容器的属性 lay-filter="对应的值"
+                var data = obj.data; //获得当前行数据
+                var layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+                var tr = obj.tr; //获得当前行 tr 的DOM对象
+                console.log("接收到事件");
+                if (layEvent === 'download') {
+                    //下载文件
+                    window.open("/download/" + data.fileId);
+                } else if (layEvent === 'del') { //删除
+                    layer.confirm('真的删除么', function (index) {
+                        //向服务端发送删除指令
+                        $.ajax({
+                            url: "/admin/file/delete",
+                            type: "POST",
+                            data: {
+                                fileId: data.fileId
+                            },
+                            success: function (data) {
+                                console.log(data);
+                                if (data.code == 0) {
+                                    obj.del(); //删除对应行（tr）的DOM结构，并更新缓存
+                                    layer.msg('已删除!', {icon: 1, time: 1000});
+
+                                }
+                            }
+                        });
+
+                    });
+                } else if (layEvent === 'status') { //设定状态
+                    console.log("发送状态更改申请");
+                    //向服务端发送修改状态指令
+                    $.ajax({
+                        url: "/admin/file/status",
+                        type: "POST",
+                        data: {
+                            fileId: data.fileId,
+                            isDelete: data.isDelete
+                        },
+                        success: function (result) {
+                            console.log(result);
+                            if (result.code == 0) {
+                                obj.update({
+                                    isDelete: data.isDelete == 1 ? 0 : 1
+                                });
+                                layer.msg('状态更改成功!', {icon: 1, time: 1000});
+                            }
+                        }
+                    });
+                }
+            });
+            $('#deleteAllBtn').on('click', function () {
+                var checkStatus = table.checkStatus('file-reload')
+                    , data = checkStatus.data;
+                var ids = [];
+                for (a in data) {
+                    ids.push(data[a].fileId);
+                }
+                // 获取选中的id
+                console.log(ids);
+                if (ids.length > 0) {
+                    layer.confirm('确认要删除吗？共' + ids.length + "条数据", function (index) {
+                        //捉到所有被选中的，发异步进行删除
+                        $.ajax({
+                            url: "/admin/file/deleteAll",
+                            type: "POST",
+                            traditional: true,//防止深度序列化
+                            data: {
+                                fileIds: ids,
+                            },
+                            success: function (data) {
+                                layer.msg('删除成功', {icon: 1});
+                                $(".layui-form-checked").not('.header').parents('tr').remove();
+                            }
+                        });
+                    });
+                } else layer.msg('请先选择数据', {time: 500});
+            });
+
+        });
+
+
+</script>
+
+</html>

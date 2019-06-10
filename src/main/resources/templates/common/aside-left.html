@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- aside -->
+<aside th:fragment="commonLeft">
+    <!-- search box -->
+    <!--<div class="main-search">-->
+        <!--<label for="main-search"><i class="icon-search"></i></label>-->
+        <!--<input id="main-search" type="text" placeholder="搜索..." />-->
+    <!--</div>-->
+    <!--<div class="divider"></div>-->
+    <!-- end search box -->
+
+    <!-- aside item: Mini profile -->
+    <div class="my-profile">
+        <span class="first-child">欢迎 <strong th:text="${session.userLoginView.name}"></strong></span>
+        <span><a href="/editInfo">个人信息 </a></span>
+    </div>
+    <div class="divider"></div>
+    <!-- end aside item: Mini profile -->
+    <!-- aside item: Menu -->
+    <div class="sidebar-nav-fixed">
+        <ul class="menu" id="accordion-menu-js">
+            <li class="" th:each="menuCodes:${session.userLoginView.menuCodes}">
+                <a href="/index" th:if="${menuCodes eq 'MEN001'}"><i class="icon-home"></i>主页</a>
+                <!--<a href="javascript:void(0)" th:if="${menuCodes eq 'MEN002'}"><i class="icon-eye-open"></i>近期事宜</a>-->
+                <a href="/manage/clazz" th:if="${menuCodes eq 'MEN003'}"><i class="icon-group"></i>班级管理</a>
+                <a href="/manage/affair" th:if="${menuCodes eq 'MEN004'}"><i class="icon-tags"></i>事务管理</a>
+                <a href="/admin/index" th:if="${menuCodes eq 'MEN005'}"><i class="icon-sitemap"></i>后台管理</a>
+                <!--<a href="javascript:void(0)" th:if="${menuCodes eq 'MEN006'}"><i class="icon-plus"></i>其他</a>-->
+            </li>
+        </ul>
+    </div>
+    <div class="divider"></div>
+    <!-- end aside item: Menu -->
+
+    <!-- aside item: Inbox -->
+    <!-- inbox message 1-->
+</aside>
+<!-- aside end -->
+</body>
+</html>

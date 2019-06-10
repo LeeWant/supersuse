@@ -1,0 +1,54 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lee.supersuse.mapper.AffairMapper">
+    <insert id="insertAffair" parameterType="Affair">
+        -- 插入一个新的事务
+        INSERT
+        INTO t_affair(affId,userId,title,level,comment,instCode,deptCode,majoCode)
+        VALUES (#{affId},#{userId},#{title},#{level},#{comment},#{instCode},#{deptCode},#{majoCode})
+    </insert>
+    <insert id="insertFile" parameterType="MyFile">
+        -- 插入附件
+        INSERT INTO t_file(fileID,affId,fileName,filePath)
+        VALUES (#{fileId},#{affId},#{fileName},#{filePath})
+    </insert>
+    <select id="selectAffairById" parameterType="java.lang.String" resultType="Affair">
+        SELECT * FROM t_affair a left join t_user u on a.userId = u.userId
+        WHERE affId = #{affId}
+--         AND isDelete= 0
+    </select>
+    <select id="selectAffairInstPathById" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT  CONCAT_WS('>',i.name,d.name,m.name) AS instPath
+        FROM t_affair a
+        LEFT JOIN t_institute i ON i.instCode = a.instCode
+        LEFT JOIN t_department d ON d.deptCode = a.deptCode
+        LEFT JOIN t_major m ON m.majoCode = a.majoCode
+        WHERE affId = #{affId}
+--         AND isDelete = 0
+    </select>
+    <select id="selectAffairFiles" parameterType="java.lang.String" resultType="MyFile">
+        SELECT * FROM t_file WHERE affId = #{affId} and isDelete = 0
+    </select>
+    <select id="selectAffairFile" parameterType="java.lang.String" resultType="MyFile">
+        SELECT * FROM t_file WHERE fileId = #{fileId}
+    </select>
+    <select id="selectAffairs" parameterType="int" resultType="Affair">
+        -- 查询所有的Affair
+        SELECT * FROM t_affair WHERE isDelete = #{isDelete} ORDER BY releaseTime DESC
+    </select>
+    <select id="countAffairByDate" parameterType="java.util.Date" resultType="int">
+        SELECT COUNT(*) FROM t_affair
+        WHERE isDelete	= 0 AND releaseTime BETWEEN #{startDate} AND #{endDate}
+    </select>
+    <select id="countAllVisitNum" resultType="int">
+        SELECT COUNT(*) FROM t_ip
+    </select>
+    <update id="deleteAffair" parameterType="java.lang.String">
+        UPDATE t_affair SET isDelete = 1
+        WHERE affId	= #{affId}
+    </update>
+
+
+
+
+</mapper>
