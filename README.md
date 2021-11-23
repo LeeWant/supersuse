@@ -12,3 +12,5 @@ SpringBoot+Thymeleaf+MyBatis制作的校园事务管理系统
 
 # 项目地址
 www.leehome.club
+
+联系我：v+Lee_SayHi（注明来意）
